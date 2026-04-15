@@ -27,16 +27,15 @@ find_package(visualization_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
-find_package(pcl_conversions REQUIRED) # 用于替代 ROS 1 的 pcl_ros 点云转换机制
+find_package(pcl_conversions REQUIRED)
 
 # 2. 寻找第三方依赖库
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 
-# 注意：已彻底移除 ROS 1 的 dynamic_reconfigure 相关代码
-
 # 3. 收集源文件
-file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h include/*.hpp include/*.cpp)
+# 【重点修改】：将 src/*.cpp 改为 src/rog_map/*.cpp，避免把 run_map.cpp 错误地编译进静态库里
+file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/rog_map/*.cpp include/*.h include/*.hpp include/*.cpp)
 
 # 4. 创建静态库目标
 add_library(${PROJECT_NAME} STATIC 
@@ -85,6 +84,28 @@ ament_export_dependencies(
 )
 ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
 
+# ====================================================================
+# 【核心新增】：编译生成最终的可执行文件 (Executable Node)
+# ====================================================================
+add_executable(rog_map_node src/run_map.cpp)
+
+# 告诉编译器，这个节点依赖哪些 ROS 2 的包
+ament_target_dependencies(rog_map_node
+    rclcpp
+    std_msgs
+    geometry_msgs
+    nav_msgs
+    visualization_msgs
+    message_filters
+    sensor_msgs
+    tf2_ros
+    pcl_conversions
+)
+
+# 将刚刚编译好的 rog_map 静态算法库链接到这个节点上
+target_link_libraries(rog_map_node ${PROJECT_NAME})
+
+
 # 9. 安装规则
 install(
     DIRECTORY include/
@@ -97,6 +118,18 @@ install(
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
+)
+
+# 【核心新增】：将生成的节点安装到 lib/rog_map 下，这样 ros2 run 和 ros2 launch 就能找到它
+install(
+    TARGETS rog_map_node
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+# 安装 launch 和 config 文件夹
+install(
+    DIRECTORY launch config
+    DESTINATION share/${PROJECT_NAME}
 )
 
 # 10. 打包
