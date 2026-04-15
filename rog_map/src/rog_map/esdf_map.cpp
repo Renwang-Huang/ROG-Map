@@ -281,7 +281,8 @@ namespace rog_map {
         pcl_pc.height = 1;
         pcl_pc.is_dense = true;
         pcl::toROSMsg(pcl_pc, pc2);
-        pc2.header.frame_id = "world";
+        // pc2.header.frame_id = "world";
+        pc2.header.frame_id = "camera_init";
     }
 
     void ESDFMap::resetOneCell(const int &hash_id) {
@@ -323,7 +324,8 @@ namespace rog_map {
         pcl_pc.height = 1;
         pcl_pc.is_dense = true;
         pcl::toROSMsg(pcl_pc, pc2);
-        pc2.header.frame_id = "world";
+        // pc2.header.frame_id = "world";
+        pc2.header.frame_id = "camera_init";
     }
 
 
@@ -362,7 +364,8 @@ namespace rog_map {
         pcl_pc.height = 1;
         pcl_pc.is_dense = true;
         pcl::toROSMsg(pcl_pc, pc2);
-        pc2.header.frame_id = "world";
+        // pc2.header.frame_id = "world";
+        pc2.header.frame_id = "camera_init";
     }
 
     template<typename F_get_val, typename F_set_val>

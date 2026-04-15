@@ -106,7 +106,8 @@ namespace rog_map {
                               const double &size,
                               const int &id = -1) {
         visualization_msgs::msg::Marker marker;
-        marker.header.frame_id = "world";
+        // marker.header.frame_id = "world";
+        marker.header.frame_id = "camera_init";
         marker.header.stamp = rclcpp::Clock().now(); // 使用 rclcpp::Clock 获取时间
         marker.action = visualization_msgs::msg::Marker::ADD;
         marker.pose.orientation.w = 1.0;
@@ -143,7 +144,7 @@ namespace rog_map {
         if (std::isnan(pt.x()) || std::isnan(pt.y()) || std::isnan(pt.z())) {
             return;
         }
-        marker_ball.header.frame_id = "world";
+        marker_ball.header.frame_id = "camera_init";
         marker_ball.header.stamp = rclcpp::Clock().now();
         marker_ball.ns = ns.c_str();
         marker_ball.id = id >= 0 ? id : cnt++;
@@ -166,7 +167,8 @@ namespace rog_map {
         // add test
         if (print_ns) {
             visualization_msgs::msg::Marker marker;
-            marker.header.frame_id = "world";
+            // marker.header.frame_id = "world";
+            marker.header.frame_id = "camera_init";
             marker.header.stamp = rclcpp::Clock().now();
             marker.action = visualization_msgs::msg::Marker::ADD;
             marker.pose.orientation.w = 1.0;
@@ -209,7 +211,8 @@ namespace rog_map {
         int id = 0;
         visualization_msgs::msg::Marker line_strip;
         line_strip.header.stamp = rclcpp::Clock().now();
-        line_strip.header.frame_id = "world";
+        // line_strip.header.frame_id = "world";
+        line_strip.header.frame_id = "camera_init";
         line_strip.action = visualization_msgs::msg::Marker::ADD;
         line_strip.ns = ns;
         line_strip.pose.orientation.w = 1.0;
@@ -274,7 +277,8 @@ namespace rog_map {
                               const double &size = 0.6,
                               const int &id = -1) {
         visualization_msgs::msg::Marker marker;
-        marker.header.frame_id = "world";
+        // marker.header.frame_id = "world";
+        marker.header.frame_id = "camera_init";
         marker.header.stamp = rclcpp::Clock().now();
         marker.action = visualization_msgs::msg::Marker::ADD;
         marker.pose.orientation.w = 1.0;
@@ -308,7 +312,8 @@ namespace rog_map {
         if (std::isnan(pt.x()) || std::isnan(pt.y()) || std::isnan(pt.z())) {
             return;
         }
-        marker_ball.header.frame_id = "world";
+        // marker_ball.header.frame_id = "world";
+        marker_ball.header.frame_id = "camera_init";
         marker_ball.header.stamp = rclcpp::Clock().now();
         marker_ball.ns = ns.c_str();
         marker_ball.id = id >= 0 ? id : cnt++;
@@ -331,7 +336,8 @@ namespace rog_map {
         // add test
         if (print_ns) {
             visualization_msgs::msg::Marker marker;
-            marker.header.frame_id = "world";
+            // marker.header.frame_id = "world";
+            marker.header.frame_id = "camera_init";
             marker.header.stamp = rclcpp::Clock().now();
             marker.action = visualization_msgs::msg::Marker::ADD;
             marker.pose.orientation.w = 1.0;
@@ -372,7 +378,8 @@ namespace rog_map {
         int id = 0;
         visualization_msgs::msg::Marker line_strip;
         line_strip.header.stamp = rclcpp::Clock().now();
-        line_strip.header.frame_id = "world";
+        // line_strip.header.frame_id = "world";
+        line_strip.header.frame_id = "camera_init";
         line_strip.action = visualization_msgs::msg::Marker::ADD;
         line_strip.ns = ns;
         line_strip.pose.orientation.w = 1.0;

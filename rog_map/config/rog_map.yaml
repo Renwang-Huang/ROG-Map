@@ -36,8 +36,8 @@ rm_node:
       # ROS 2 Topics configuration
       ros_callback:
         enable: true
-        cloud_topic: "/laserMapping/cloud_registered"
-        odom_topic: "/laserMapping/odometry"
+        cloud_topic: "/cloud_registered"
+        odom_topic: "/Odometry"
         odom_timeout: 2.0
 
       visualization:
@@ -47,7 +47,7 @@ rm_node:
         frame_rate: 0.0
         # visualization range along the odom [m].
         range: [50.0, 50.0, 6.0]
-        frame_id: "world"
+        frame_id: "camera_init"
         pub_unknown_map_en: false
 
       # Intensity filter
