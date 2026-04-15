@@ -245,8 +245,12 @@ namespace rog_map {
 #endif
     }
 
+    // void ESDFMap::getESDFOccPC2(const rog_map::Vec3f &box_min_d, const rog_map::Vec3f &box_max_d,
+    //                             sensor_msgs::PointCloud2 &pc2) {
+    
     void ESDFMap::getESDFOccPC2(const rog_map::Vec3f &box_min_d, const rog_map::Vec3f &box_max_d,
-                                sensor_msgs::PointCloud2 &pc2) {
+                            sensor_msgs::msg::PointCloud2 &pc2) {
+
         std::lock_guard<std::mutex> lck(update_esdf_mtx);
         pcl_pc.clear();
         Vec3i box_min_i, box_max_i;
@@ -284,8 +288,12 @@ namespace rog_map {
     }
 
 
+    // void ESDFMap::getPositiveESDFPC2(const rog_map::Vec3f &box_min_d, const rog_map::Vec3f &box_max_d,
+    //                                  const double &visualize_z, sensor_msgs::PointCloud2 &pc2) {
+
     void ESDFMap::getPositiveESDFPC2(const rog_map::Vec3f &box_min_d, const rog_map::Vec3f &box_max_d,
-                                     const double &visualize_z, sensor_msgs::PointCloud2 &pc2) {
+                                 const double &visualize_z, sensor_msgs::msg::PointCloud2 &pc2) {
+
         std::lock_guard<std::mutex> lck(update_esdf_mtx);
         pcl_pc.clear();
         Vec3i box_min_i, box_max_i;
@@ -319,8 +327,12 @@ namespace rog_map {
     }
 
 
+    // void ESDFMap::getNegativeESDFPC2(const rog_map::Vec3f &box_min_d, const rog_map::Vec3f &box_max_d,
+    //                                  const double &visualize_z, sensor_msgs::PointCloud2 &pc2) {
+
     void ESDFMap::getNegativeESDFPC2(const rog_map::Vec3f &box_min_d, const rog_map::Vec3f &box_max_d,
-                                     const double &visualize_z, sensor_msgs::PointCloud2 &pc2) {
+                                 const double &visualize_z, sensor_msgs::msg::PointCloud2 &pc2) {
+
         std::lock_guard<std::mutex> lck(update_esdf_mtx);
         pcl_pc.clear();
         Vec3i box_min_i, box_max_i;

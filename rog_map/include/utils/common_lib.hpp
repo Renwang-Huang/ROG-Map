@@ -23,7 +23,9 @@
 
 #pragma once
 
-#include <ros/ros.h>
+// ROS 2 核心头文件
+#include <rclcpp/rclcpp.hpp> 
+
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -215,4 +217,3 @@ namespace rog_map {
         return false;
     }
 }
-

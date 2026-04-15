@@ -24,6 +24,9 @@
 #pragma once
 
 #include <utils/common_lib.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <type_traits>
+#include <algorithm>
 
 namespace rog_map {
     using std::string;
@@ -37,18 +40,38 @@ namespace rog_map {
     private:
         template<class T>
         bool LoadParam(string param_name, T &param_value, T default_value = T{}, bool required = false) {
-            if (nh_.getParam(param_name, param_value)) {
-                printf("\033[0;32m Load param %s succes: \033[0;0m", (nh_.getNamespace() + "/" + param_name).c_str());
+            if (!nh_) return false;
+
+            // ROS 2 参数系统不允许使用 '/'，必须替换为 '.'
+            std::string ros2_param_name = param_name;
+            std::replace(ros2_param_name.begin(), ros2_param_name.end(), '/', '.');
+
+            try {
+                // ROS 2 不支持 float 参数，必须映射到 double
+                using RosType = typename std::conditional<std::is_same<T, float>::value, double, T>::type;
+                RosType ros_default = static_cast<RosType>(default_value);
+                RosType ros_val;
+
+                if (!nh_->has_parameter(ros2_param_name)) {
+                    ros_val = nh_->declare_parameter<RosType>(ros2_param_name, ros_default);
+                } else {
+                    ros_val = nh_->get_parameter(ros2_param_name).get_value<RosType>();
+                }
+                param_value = static_cast<T>(ros_val);
+
+                // 打印信息（保持原有的输出格式与命名空间拼接体验）
+                printf("\033[0;32m Load param %s success: \033[0;0m", (std::string(nh_->get_namespace()) + "/" + param_name).c_str());
                 std::cout << param_value << std::endl;
                 return true;
-            } else {
+
+            } catch (const std::exception& e) {
                 printf("\033[0;33m Load param %s failed, use default value: \033[0;0m",
-                       (nh_.getNamespace() + "/" + param_name).c_str());
+                       (std::string(nh_->get_namespace()) + "/" + param_name).c_str());
                 param_value = default_value;
                 std::cout << param_value << std::endl;
                 if (required) {
                     throw std::invalid_argument(
-                            string("Required param " + (nh_.getNamespace() + "/" + param_name) + " not found"));
+                            string("Required param " + std::string(nh_->get_namespace()) + "/" + param_name + " not found"));
                 }
                 return false;
             }
@@ -57,16 +80,34 @@ namespace rog_map {
         template<class T>
         bool LoadParam(string param_name, vector<T> &param_value, vector<T> default_value = vector<T>{},
                        bool required = false) {
-            if (nh_.getParam(param_name, param_value)) {
-                printf("\033[0;32m Load param %s succes: \033[0;0m", (nh_.getNamespace() + "/" + param_name).c_str());
+            if (!nh_) return false;
+
+            std::string ros2_param_name = param_name;
+            std::replace(ros2_param_name.begin(), ros2_param_name.end(), '/', '.');
+
+            try {
+                using RosType = typename std::conditional<std::is_same<T, float>::value, double, T>::type;
+                std::vector<RosType> ros_default(default_value.begin(), default_value.end());
+                std::vector<RosType> ros_val;
+
+                if (!nh_->has_parameter(ros2_param_name)) {
+                    ros_val = nh_->declare_parameter<std::vector<RosType>>(ros2_param_name, ros_default);
+                } else {
+                    ros_val = nh_->get_parameter(ros2_param_name).get_value<std::vector<RosType>>();
+                }
+                
+                param_value.assign(ros_val.begin(), ros_val.end());
+
+                printf("\033[0;32m Load param %s success: \033[0;0m", (std::string(nh_->get_namespace()) + "/" + param_name).c_str());
                 for (size_t i = 0; i < param_value.size(); i++) {
                     std::cout << param_value[i] << " ";
                 }
                 std::cout << std::endl;
                 return true;
-            } else {
+
+            } catch (const std::exception& e) {
                 printf("\033[0;33m Load param %s failed, use default value: \033[0;0m",
-                       (nh_.getNamespace() + "/" + param_name).c_str());
+                       (std::string(nh_->get_namespace()) + "/" + param_name).c_str());
                 param_value = default_value;
                 for (size_t i = 0; i < param_value.size(); i++) {
                     std::cout << param_value[i] << " ";
@@ -74,7 +115,7 @@ namespace rog_map {
                 std::cout << std::endl;
                 if (required) {
                     throw std::invalid_argument(
-                            string("Required param " + (nh_.getNamespace() + "/" + param_name) + " not found"));
+                            string("Required param " + std::string(nh_->get_namespace()) + "/" + param_name + " not found"));
                 }
                 return false;
             }
@@ -83,9 +124,10 @@ namespace rog_map {
     public:
         Config(){};
 
-        Config(const ros::NodeHandle &nh,
+        // 核心修改：接收 rclcpp::Node 的共享指针
+        Config(rclcpp::Node::SharedPtr nh,
                const string &name_space = "rog_map") : nh_(nh) {
-            std::cout<<" -- [ROG Config] Current namespace: "<< nh_.getNamespace()<<std::endl;
+            std::cout<<" -- [ROG Config] Current namespace: "<< nh_->get_namespace() <<std::endl;
             LoadParam(name_space + "/esdf/resolution", esdf_resolution, 0.2);
             LoadParam(name_space + "/esdf/enable", esdf_en, false);
             vector<double> temp_esdf_update_box;
@@ -93,7 +135,7 @@ namespace rog_map {
 
             if (esdf_en) {
                 if (temp_esdf_update_box.size() != 3) {
-                    ROS_ERROR("Fix map origin size is not 3!");
+                    RCLCPP_ERROR(nh_->get_logger(), "Fix map origin size is not 3!");
                     exit(-1);
                 } else {
                     esdf_local_update_box = Vec3f(temp_esdf_update_box[0], temp_esdf_update_box[1],
@@ -113,7 +155,7 @@ namespace rog_map {
             vector<double> temp_fix_origin;
             LoadParam(name_space + "/fix_map_origin", temp_fix_origin, vector<double>{0, 0, 0});
             if (temp_fix_origin.size() != 3) {
-                ROS_ERROR("Fix map origin size is not 3!");
+                RCLCPP_ERROR(nh_->get_logger(), "Fix map origin size is not 3!");
                 exit(-1);
             } else {
                 fix_map_origin = Vec3f(temp_fix_origin[0], temp_fix_origin[1], temp_fix_origin[2]);
@@ -136,7 +178,7 @@ namespace rog_map {
             vector<double> temp_vis_range;
             LoadParam(name_space + "/visualization/range", temp_vis_range, vector<double>{0, 0, 0});
             if (temp_vis_range.size() != 3) {
-                ROS_ERROR("Visualization range size is not 3!");
+                RCLCPP_ERROR(nh_->get_logger(), "Visualization range size is not 3!");
                 exit(-1);
             } else {
                 visualization_range = Vec3f(temp_vis_range[0], temp_vis_range[1], temp_vis_range[2]);
@@ -152,13 +194,9 @@ namespace rog_map {
             LoadParam(name_space + "/inflation_resolution", inflation_resolution, 0.1);
             /// Resize the map to ease indexing
             if (resolution > inflation_resolution) {
-                ROS_ERROR("The inflation resolution should be equal or larger than the resolution!");
+                RCLCPP_ERROR(nh_->get_logger(), "The inflation resolution should be equal or larger than the resolution!");
                 exit(-1);
             }
-//    int scale = floor(inflation_resolution / resolution / 2);
-//    inflation_resolution = resolution * (scale * 2 + 1);
-//    ROS_ERROR("The inflation resolution is set to %f", inflation_resolution);
-
 
             /* For unk inflation */
             LoadParam(name_space + "/unk_inflation_en", unk_inflation_en, false);
@@ -170,7 +208,7 @@ namespace rog_map {
             vector<double> temp_map_size;
             LoadParam(name_space + "/map_size", temp_map_size, vector<double>{10, 10, 0});
             if (temp_map_size.size() != 3) {
-                ROS_ERROR("Map size dimension is not 3!");
+                RCLCPP_ERROR(nh_->get_logger(), "Map size dimension is not 3!");
                 exit(-1);
             }
             map_size_d = Vec3f(temp_map_size[0], temp_map_size[1], temp_map_size[2]);
@@ -204,7 +242,7 @@ namespace rog_map {
             vector<double> temp_ray_range;
             LoadParam(name_space + "/raycasting/ray_range", temp_ray_range, vector<double>{0.3, 10});
             if (temp_ray_range.size() != 2) {
-                ROS_ERROR("Ray range size is not 2!");
+                RCLCPP_ERROR(nh_->get_logger(), "Ray range size is not 2!");
                 exit(-1);
             }
             raycast_range_min = temp_ray_range[0];
@@ -214,7 +252,7 @@ namespace rog_map {
             vector<double> update_box;
             LoadParam(name_space + "/raycasting/local_update_box", update_box, vector<double>{999, 999, 999});
             if (update_box.size() != 3) {
-                ROS_ERROR("Update box size is not 3!");
+                RCLCPP_ERROR(nh_->get_logger(), "Update box size is not 3!");
                 exit(-1);
             }
             local_update_box_d = Vec3f(update_box[0], update_box[1], update_box[2]);
@@ -382,7 +420,8 @@ namespace rog_map {
         }
 
 
-        ros::NodeHandle nh_;
+        // 替换为 ROS 2 的节点句柄智能指针
+        rclcpp::Node::SharedPtr nh_;
 
     };
 

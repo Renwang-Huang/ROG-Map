@@ -6,3 +6,7 @@
 **.bag
 **/.catkin_workspace
 **.csv
+
+install/
+
+log/

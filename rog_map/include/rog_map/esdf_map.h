@@ -24,8 +24,9 @@
 #pragma once
 
 #include <rog_map/rog_map_core/counter_map.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <visualization_msgs/MarkerArray.h>
+// ROS 2 Humble 头文件适配
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 //#define ESDF_MAP_DEBUG
 
@@ -48,9 +49,6 @@ namespace rog_map {
                 const Vec3f &fix_map_origin,
                 const double &unk_thresh);
 
-
-
-
         void getUpdatedBbox(Vec3f & box_min,Vec3f & box_max)const;
 
         void resetLocalMap() override;
@@ -63,29 +61,33 @@ namespace rog_map {
 
         void resetOneCell(const int & hash_id) override;
 
-
         void evaluateEDT(const Eigen::Vector3d& pos, double& dist);
         void evaluateFirstGrad(const Eigen::Vector3d& pos, Eigen::Vector3d& grad);
         void evaluateSecondGrad(const Eigen::Vector3d& pos, Eigen::Vector3d& grad);
+        
+        // 适配 ROS 2 命名空间
         void visEDTGrad(const Vec3f &box_min_d,
                         const Vec3f &box_max_d,
                         const double &visualize_z,
-                        visualization_msgs::MarkerArray &mk_arr);
+                        visualization_msgs::msg::MarkerArray &mk_arr);
 
         /*Only for visualize */
+        // 适配 ROS 2 命名空间
         void getESDFOccPC2(const Vec3f &box_min_d,
                            const Vec3f &box_max_d,
-                           sensor_msgs::PointCloud2 &pc2);
+                           sensor_msgs::msg::PointCloud2 &pc2);
 
+        // 适配 ROS 2 命名空间
         void getPositiveESDFPC2(const Vec3f &box_min_d,
                                 const Vec3f &box_max_d,
                                 const double &visualize_z,
-                                sensor_msgs::PointCloud2 &pc2);
+                                sensor_msgs::msg::PointCloud2 &pc2);
 
+        // 适配 ROS 2 命名空间
         void getNegativeESDFPC2(const Vec3f &box_min_d,
                                 const Vec3f &box_max_d,
                                 const double &visualize_z,
-                                sensor_msgs::PointCloud2 &pc2) ;
+                                sensor_msgs::msg::PointCloud2 &pc2) ;
 
     private:
 
@@ -115,8 +117,6 @@ namespace rog_map {
         void interpolateTrilinearSecondGrad(double first_grad[2][2][2][3], const Eigen::Vector3d& diff, Eigen::Vector3d& grad);
         void getSurroundPts(const Vec3f& pos, Vec3f pts[2][2][2], Vec3f & diff);
 
-
     };
 
 }
-
