@@ -97,7 +97,6 @@ namespace rog_map {
 
 
     /* Type A, directly publish marker in publisher */
-    // Publisher 参数替换为 ROS 2 的 SharedPtr
     static void visualizeText(const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr &pub,
                               const std::string &ns,
                               const std::string &text,
@@ -108,7 +107,7 @@ namespace rog_map {
         visualization_msgs::msg::Marker marker;
         // marker.header.frame_id = "world";
         marker.header.frame_id = "camera_init";
-        marker.header.stamp = rclcpp::Clock().now(); // 使用 rclcpp::Clock 获取时间
+        marker.header.stamp = rclcpp::Clock().now(); 
         marker.action = visualization_msgs::msg::Marker::ADD;
         marker.pose.orientation.w = 1.0;
         marker.ns = ns.c_str();
@@ -128,7 +127,7 @@ namespace rog_map {
         marker.pose.orientation.w = 1.0;
         visualization_msgs::msg::MarkerArray arr;
         arr.markers.push_back(marker);
-        pub->publish(arr); // 指针调用
+        pub->publish(arr); 
     };
 
     static void visualizePoint(const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr &pub_,
@@ -190,7 +189,7 @@ namespace rog_map {
             mkr_arr.markers.push_back(marker);
         }
 
-        pub_->publish(mkr_arr); // 指针调用
+        pub_->publish(mkr_arr); 
     }
 
     static void visualizeBoundingBox(const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr &pub,
@@ -222,7 +221,7 @@ namespace rog_map {
 
 
         line_strip.color = color;
-        line_strip.color.a = alpha; //不透明度，设0则全透明
+        line_strip.color.a = alpha; 
         geometry_msgs::msg::Point p[8];
 
         //vis_pos_world是目标物的坐标

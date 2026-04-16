@@ -23,7 +23,6 @@
 
 #pragma once
 
-// ROS 2 核心头文件
 #include <rclcpp/rclcpp.hpp> 
 
 #include <pcl/point_cloud.h>

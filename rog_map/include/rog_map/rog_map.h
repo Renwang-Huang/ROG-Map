@@ -31,9 +31,8 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <tf2_ros/transform_broadcaster.h>
-#include <rcl_interfaces/msg/set_parameters_result.hpp> // 用于 ROS 2 动态调参
+#include <rcl_interfaces/msg/set_parameters_result.hpp> 
 
-// 移除原有的 ROS 1 dynamic_reconfigure 头文件
 // #include <dynamic_reconfigure/server.h>
 // #include <rog_map/VizConfig.h>
 
@@ -52,7 +51,6 @@ namespace rog_map {
 
         typedef shared_ptr<ROGMap> Ptr;
 
-        // 使用 rclcpp::Node 的共享指针替代 ros::NodeHandle
         ROGMap(rclcpp::Node::SharedPtr nh);
 
         ~ROGMap() = default;
@@ -76,28 +74,23 @@ namespace rog_map {
         RobotState getRobotState() const;
 
     private:
-        // 节点句柄变为 ROS 2 智能指针
         rclcpp::Node::SharedPtr nh_;
 
         RobotState robot_state_;
 
-        // 声明用于替代 dynamic_reconfigure 的参数回调句柄
         rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr param_callback_handle_;
 
         struct ROSCallback {
-            // 订阅器变为 ROS 2 模板类智能指针
             rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub;
             rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_sub;
             int unfinished_frame_cnt{0};
             Pose pc_pose;
             PointCloud pc;
-            // 定时器变为 ROS 2 类型
             rclcpp::TimerBase::SharedPtr update_timer;
             mutex updete_lock;
         } rc_;
 
         struct VisualizeMap {
-            // 发布器变为 ROS 2 模板类智能指针
             rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr occ_pub, unknown_pub,
                     occ_inf_pub, unknown_inf_pub,
                     frontier_pub, esdf_pub, esdf_neg_pub, esdf_occ_pub;
@@ -107,7 +100,6 @@ namespace rog_map {
             rclcpp::TimerBase::SharedPtr viz_timer;
             
             struct VizCfg {
-                // 彻底移除了 dynamic_reconfigure::Server 相关变量
                 bool use_body_center{false};
                 Vec3f box_min, box_max;
             } vizcfg;
@@ -117,21 +109,17 @@ namespace rog_map {
 
         void updateRobotState(const Pose &pose);
 
-        // 回调函数参数修改为 ROS 2 的 ConstSharedPtr
         void odomCallback(const nav_msgs::msg::Odometry::ConstSharedPtr msg);
 
         void cloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg);
 
-        // 移除 ROS 1 的 ros::TimerEvent 参数
         void updateCallback();
 
-        // 消息类型加上 msg:: 命名空间
         // static void vecEVec3fToPC2(const vec_E<Vec3f> &points, sensor_msgs::msg::PointCloud2 &cloud);
         void vecEVec3fToPC2(const vec_E<Vec3f> &points, sensor_msgs::msg::PointCloud2 &cloud);
 
         void vizCallback();
 
-        // 将 dynamic_reconfigure 的回调替换为 ROS 2 参数回调签名
         rcl_interfaces::msg::SetParametersResult VizCfgCallback(const std::vector<rclcpp::Parameter> &parameters);
 
     };

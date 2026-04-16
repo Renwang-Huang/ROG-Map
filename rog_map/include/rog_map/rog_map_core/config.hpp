@@ -42,12 +42,10 @@ namespace rog_map {
         bool LoadParam(string param_name, T &param_value, T default_value = T{}, bool required = false) {
             if (!nh_) return false;
 
-            // ROS 2 参数系统不允许使用 '/'，必须替换为 '.'
             std::string ros2_param_name = param_name;
             std::replace(ros2_param_name.begin(), ros2_param_name.end(), '/', '.');
 
             try {
-                // ROS 2 不支持 float 参数，必须映射到 double
                 using RosType = typename std::conditional<std::is_same<T, float>::value, double, T>::type;
                 RosType ros_default = static_cast<RosType>(default_value);
                 RosType ros_val;
@@ -59,7 +57,6 @@ namespace rog_map {
                 }
                 param_value = static_cast<T>(ros_val);
 
-                // 打印信息（保持原有的输出格式与命名空间拼接体验）
                 printf("\033[0;32m Load param %s success: \033[0;0m", (std::string(nh_->get_namespace()) + "/" + param_name).c_str());
                 std::cout << param_value << std::endl;
                 return true;
@@ -124,7 +121,6 @@ namespace rog_map {
     public:
         Config(){};
 
-        // 核心修改：接收 rclcpp::Node 的共享指针
         Config(rclcpp::Node::SharedPtr nh,
                const string &name_space = "rog_map") : nh_(nh) {
             std::cout<<" -- [ROG Config] Current namespace: "<< nh_->get_namespace() <<std::endl;
@@ -418,9 +414,6 @@ namespace rog_map {
             local_update_box_i = half_local_update_box_i * 2 + Vec3i::Constant(1);
             local_update_box_d = local_update_box_i.cast<double>() * resolution;
         }
-
-
-        // 替换为 ROS 2 的节点句柄智能指针
         rclcpp::Node::SharedPtr nh_;
 
     };

@@ -1,8 +1,5 @@
 rm_node:
   ros__parameters:
-    #############################################
-    #                   Mapping                 #
-    #############################################
     rog_map:
       resolution: 0.1
       inflation_resolution: 0.2

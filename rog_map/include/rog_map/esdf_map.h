@@ -24,7 +24,6 @@
 #pragma once
 
 #include <rog_map/rog_map_core/counter_map.h>
-// ROS 2 Humble 头文件适配
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
@@ -65,25 +64,20 @@ namespace rog_map {
         void evaluateFirstGrad(const Eigen::Vector3d& pos, Eigen::Vector3d& grad);
         void evaluateSecondGrad(const Eigen::Vector3d& pos, Eigen::Vector3d& grad);
         
-        // 适配 ROS 2 命名空间
         void visEDTGrad(const Vec3f &box_min_d,
                         const Vec3f &box_max_d,
                         const double &visualize_z,
                         visualization_msgs::msg::MarkerArray &mk_arr);
 
-        /*Only for visualize */
-        // 适配 ROS 2 命名空间
         void getESDFOccPC2(const Vec3f &box_min_d,
                            const Vec3f &box_max_d,
                            sensor_msgs::msg::PointCloud2 &pc2);
 
-        // 适配 ROS 2 命名空间
         void getPositiveESDFPC2(const Vec3f &box_min_d,
                                 const Vec3f &box_max_d,
                                 const double &visualize_z,
                                 sensor_msgs::msg::PointCloud2 &pc2);
 
-        // 适配 ROS 2 命名空间
         void getNegativeESDFPC2(const Vec3f &box_min_d,
                                 const Vec3f &box_max_d,
                                 const double &visualize_z,

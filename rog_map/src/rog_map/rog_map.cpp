@@ -128,7 +128,6 @@ ROGMap::ROGMap(rclcpp::Node::SharedPtr nh) : nh_(nh) {
     }
 }
 
-// ... [此处保持 isLineFree 与 updateMap 相关的函数实现完全不变，因其不依赖 ROS 接口] ...
 bool ROGMap::isLineFree(const rog_map::Vec3f& start_pt, const rog_map::Vec3f& end_pt,
                         const bool& use_inf_map, const bool& use_unk_as_occ) const {
     if(start_pt.array().isNaN().any() || end_pt.array().isNaN().any() ) {
