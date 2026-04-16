@@ -299,11 +299,4 @@ namespace rog_map {
         // 2. get true grid type
         return getGridType(id_g);
     }
-
-
-
-
-
-
-
 }

@@ -415,7 +415,5 @@ namespace rog_map {
             local_update_box_d = local_update_box_i.cast<double>() * resolution;
         }
         rclcpp::Node::SharedPtr nh_;
-
     };
-
 }

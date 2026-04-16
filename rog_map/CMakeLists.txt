@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8) # ROS 2 推荐的最低 CMake 版本
+cmake_minimum_required(VERSION 3.8) 
 project(rog_map)
 
 set(CMAKE_CXX_STANDARD 17)

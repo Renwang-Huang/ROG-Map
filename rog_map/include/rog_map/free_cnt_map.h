@@ -103,8 +103,5 @@ namespace rog_map {
         bool map_empty_{true};
         std::vector<int16_t> neighbor_free_cnt;
         rog_map::Config cfg_;
-
     };
-
 }
-

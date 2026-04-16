@@ -562,8 +562,4 @@ namespace rog_map {
         grad[2] *= sc_.resolution_inv;
 
     }
-
-
-
 }
-

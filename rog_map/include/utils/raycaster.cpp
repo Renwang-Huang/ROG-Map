@@ -190,6 +190,5 @@ namespace rog_map {
             }
             return true;
         }
-
     }
 }

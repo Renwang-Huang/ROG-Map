@@ -25,16 +25,14 @@
 
 #include "utils/common_lib.hpp"
 
-// ROS 2 消息与核心库头文件替换
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/color_rgba.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <geometry_msgs/msg/point.hpp>
-#include <cmath> // 用于 std::isnan
+#include <cmath> 
 
 namespace rog_map {
-    // 继承的基类加上 msg:: 命名空间
     class Color : public std_msgs::msg::ColorRGBA {
     public:
         Color() : std_msgs::msg::ColorRGBA() {}
@@ -218,7 +216,6 @@ namespace rog_map {
         line_strip.id = id++; //unique id, useful when multiple markers exist.
         line_strip.type = visualization_msgs::msg::Marker::LINE_STRIP; //marker type
         line_strip.scale.x = size_x;
-
 
         line_strip.color = color;
         line_strip.color.a = alpha; 
@@ -432,5 +429,4 @@ namespace rog_map {
         line_strip.points.push_back(p[4]);
         mkrarr.markers.push_back(line_strip);
     }
-
 }

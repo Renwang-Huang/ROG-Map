@@ -27,7 +27,6 @@
 using namespace rog_map;
 using std::placeholders::_1;
 
-// 修改1：NodeHandle 替换为 rclcpp::Node::SharedPtr
 ROGMap::ROGMap(rclcpp::Node::SharedPtr nh) : nh_(nh) {
 
     cfg_ = rog_map::Config(nh);
@@ -40,7 +39,6 @@ ROGMap::ROGMap(rclcpp::Node::SharedPtr nh) : nh_(nh) {
     vm_.vizcfg.box_min = -cfg_.visualization_range / 2;
     vm_.vizcfg.box_max = cfg_.visualization_range / 2;
 
-    // 修改2：移除 ROS 1 的 dynamic_reconfigure，改为 ROS 2 的参数回调机制
     if (cfg_.use_dynamic_reconfigure) {
         param_callback_handle_ = nh_->add_on_set_parameters_callback(
             std::bind(&ROGMap::VizCfgCallback, this, _1));
@@ -64,7 +62,6 @@ ROGMap::ROGMap(rclcpp::Node::SharedPtr nh) : nh_(nh) {
     }
 
     /// Initialize visualization module
-    // 修改3：使用 create_publisher 替代 advertise，加上 ::msg:: 命名空间
     if (cfg_.visualization_en) {
         vm_.occ_pub = nh_->create_publisher<sensor_msgs::msg::PointCloud2>("rog_map/occ", 1);
         vm_.unknown_pub = nh_->create_publisher<sensor_msgs::msg::PointCloud2>("rog_map/unk", 1);
@@ -81,7 +78,6 @@ ROGMap::ROGMap(rclcpp::Node::SharedPtr nh) : nh_(nh) {
             vm_.esdf_occ_pub = nh_->create_publisher<sensor_msgs::msg::PointCloud2>("rog_map/esdf/occ", 1);
         }
 
-        // 修改4：使用 create_wall_timer 替代 createTimer
         if (cfg_.viz_time_rate > 0) {
             vm_.viz_timer = nh_->create_wall_timer(
                 std::chrono::duration<double>(1.0 / cfg_.viz_time_rate),
@@ -91,7 +87,6 @@ ROGMap::ROGMap(rclcpp::Node::SharedPtr nh) : nh_(nh) {
     vm_.mkr_arr_pub = nh_->create_publisher<visualization_msgs::msg::MarkerArray>("rog_map/map_bound", 1);
 
     if (cfg_.ros_callback_en) {
-        // 修改5：使用 create_subscription 替代 subscribe
         rc_.odom_sub = nh_->create_subscription<nav_msgs::msg::Odometry>(
             cfg_.odom_topic, 1, std::bind(&ROGMap::odomCallback, this, _1));
         
@@ -235,19 +230,16 @@ void ROGMap::updateMap(const PointCloud& cloud, const Pose& pose) {
 RobotState ROGMap::getRobotState() const {
     return robot_state_;
 }
-// ... [无依赖 ROS 部分结束] ...
 
 void ROGMap::updateRobotState(const Pose& pose) {
     robot_state_.p = pose.first;
     robot_state_.q = pose.second;
-    // 修改6：更新系统时间获取方式
     robot_state_.rcv_time = nh_->now().seconds();
     robot_state_.rcv = true;
     robot_state_.yaw = get_yaw_from_quaternion<double>(pose.second);
     updateLocalBox(pose.first);
 }
 
-// 修改7：回调参数变为 ROS 2 的 SharedPtr
 void ROGMap::odomCallback(const nav_msgs::msg::Odometry::ConstSharedPtr msg) {
     updateRobotState(std::make_pair(
         Vec3f(msg->pose.pose.position.x, msg->pose.pose.position.y,
@@ -255,7 +247,6 @@ void ROGMap::odomCallback(const nav_msgs::msg::Odometry::ConstSharedPtr msg) {
         Quatf(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x,
               msg->pose.pose.orientation.y, msg->pose.pose.orientation.z)));
 
-    // 修改8：动态创建或复用 TF2 Broadcaster，且需要绑定 Node
     static std::shared_ptr<tf2_ros::TransformBroadcaster> br_map_ego;
     if (!br_map_ego) {
         br_map_ego = std::make_shared<tf2_ros::TransformBroadcaster>(nh_);
@@ -286,7 +277,6 @@ void ROGMap::cloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr m
         return;
     }
     PointCloud temp_pc;
-    // PCL Conversion: ROS 2 类型
     pcl::fromROSMsg(*msg, temp_pc);
     rc_.updete_lock.lock();
     rc_.pc = temp_pc;
@@ -296,7 +286,6 @@ void ROGMap::cloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr m
     rc_.updete_lock.unlock();
 }
 
-// 修改9：去除了 TimerEvent 参数，ROS 2 默认无需携带
 void ROGMap::updateCallback() {
     if (map_empty_) {
         static double last_print_t = nh_->now().seconds();
@@ -372,7 +361,6 @@ void ROGMap::vizCallback() {
         return;
     }
 
-    // 修改10：获取订阅者数量的方法由 getNumSubscribers() 变为 get_subscription_count()
     if (cfg_.pub_unknown_map_en && vm_.unknown_pub->get_subscription_count() >= 1) {
         vec_E<Vec3f> unknown_map, inf_unknown_map;
         boxSearch(box_min, box_max, UNKNOWN, unknown_map);
@@ -463,7 +451,6 @@ void ROGMap::vizCallback() {
     vm_.mkr_arr_pub->publish(vm_.mkr_arr);
 }
 
-// 修改11：重写动态调参回调，匹配 ROS 2 参数系统机制
 rcl_interfaces::msg::SetParametersResult ROGMap::VizCfgCallback(const std::vector<rclcpp::Parameter> &parameters) {
     rcl_interfaces::msg::SetParametersResult result;
     result.successful = true;

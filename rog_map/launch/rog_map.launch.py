@@ -18,5 +18,5 @@ def generate_launch_description():
 
     return LaunchDescription([
         rm_node,
-        # keyboard_control_node
     ])
+    

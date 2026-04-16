@@ -25,7 +25,6 @@
 
 #include <rog_map/prob_map.h>
 
-// ROS 2 相关头文件替换
 #include <rclcpp/rclcpp.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
@@ -121,6 +120,5 @@ namespace rog_map {
         void vizCallback();
 
         rcl_interfaces::msg::SetParametersResult VizCfgCallback(const std::vector<rclcpp::Parameter> &parameters);
-
     };
 }

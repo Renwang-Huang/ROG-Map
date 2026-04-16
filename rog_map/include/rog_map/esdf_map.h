@@ -103,14 +103,11 @@ namespace rog_map {
                                 const rog_map::GridType &to_type) override {}
 
         // EDT Environment
-
         void getSurroundDistance(Eigen::Vector3d pts[2][2][2], double dists[2][2][2]);
         void getSurroundFirstGrad(Eigen::Vector3d pts[2][2][2], double first_grad[2][2][2][3]);
         void interpolateTrilinearEDT(double values[2][2][2], const Eigen::Vector3d& diff, double& value);
         void interpolateTrilinearFirstGrad(double values[2][2][2], const Eigen::Vector3d& diff, Eigen::Vector3d& grad);
         void interpolateTrilinearSecondGrad(double first_grad[2][2][2][3], const Eigen::Vector3d& diff, Eigen::Vector3d& grad);
         void getSurroundPts(const Vec3f& pos, Vec3f pts[2][2][2], Vec3f & diff);
-
     };
-
 }

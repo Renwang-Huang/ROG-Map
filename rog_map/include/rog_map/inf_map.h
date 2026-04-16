@@ -82,4 +82,3 @@ namespace rog_map {
         void resetOneCell(const int &hash_id) override;
     };
 }
-

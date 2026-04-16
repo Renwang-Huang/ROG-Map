@@ -128,11 +128,7 @@ namespace rog_map {
         void updateLocalMapOriginAndBound(const Vec3f &new_origin_d,
                                           const Vec3i &new_origin_i);
 
-
     private:
         bool had_been_initialized{false};
-
     };
-
-
 }

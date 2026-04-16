@@ -131,8 +131,5 @@ namespace rog_map {
         }
 
         bool had_been_initialized{false};
-
-
     };
 }
-
