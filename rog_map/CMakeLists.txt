@@ -30,7 +30,7 @@ find_package(pcl_conversions REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 
-file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/rog_map/*.cpp include/*.h include/*.hpp include/*.cpp)
+file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h include/*.hpp include/*.cpp)
 
 add_library(${PROJECT_NAME} STATIC 
     ${srcs}
